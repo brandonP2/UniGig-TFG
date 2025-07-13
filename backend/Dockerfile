@@ -20,11 +20,13 @@ COPY . .
 RUN npx prisma generate
 
 # Build TypeScript and ensure dist directory exists
-RUN mkdir -p dist && \
-    npm run build
+RUN npm run build || (ls -la && pwd && echo "Build failed")
 
-# Verify the build
-RUN ls -la dist/
+# List contents of dist directory for debugging
+RUN ls -la dist/ || echo "dist directory not found"
+
+# List contents of src directory for debugging
+RUN ls -la src/ || echo "src directory not found"
 
 # Clean up dev dependencies
 RUN npm prune --production
@@ -33,4 +35,4 @@ RUN npm prune --production
 EXPOSE 3001
 
 # Start the application
-CMD ["npm", "start"] 
+CMD ["node", "dist/index.js"] 
