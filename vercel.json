@@ -6,5 +6,10 @@
   "framework": "nextjs",
   "env": {
     "NEXT_PUBLIC_API_URL": "https://unigig-tfg-production.up.railway.app"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_API_URL": "https://unigig-tfg-production.up.railway.app"
+    }
   }
 } 
