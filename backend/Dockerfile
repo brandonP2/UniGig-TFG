@@ -19,8 +19,12 @@ COPY . .
 # Generate Prisma Client
 RUN npx prisma generate
 
-# Build TypeScript
-RUN npm run build
+# Build TypeScript and ensure dist directory exists
+RUN mkdir -p dist && \
+    npm run build
+
+# Verify the build
+RUN ls -la dist/
 
 # Clean up dev dependencies
 RUN npm prune --production
