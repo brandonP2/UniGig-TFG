@@ -6,7 +6,6 @@ export default function ChooseRole() {
   const router = useRouter();
 
   const handleRoleSelect = (role: 'STUDENT' | 'CLIENT') => {
-    // Store the selected role in localStorage to use it in the registration page
     localStorage.setItem('selectedRole', role);
     router.push('/register');
   };

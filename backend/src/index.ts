@@ -12,6 +12,15 @@ import categoryRoutes from './routes/categories';
 
 dotenv.config();
 
+// Debug environment variables
+console.log('Environment variables check:', {
+  hasDatabase: !!process.env.DATABASE_URL,
+  hasSupabaseUrl: !!process.env.SUPABASE_URL,
+  hasSupabaseKey: !!process.env.SUPABASE_ANON_KEY,
+  hasJwtSecret: !!process.env.JWT_SECRET,
+  port: process.env.PORT
+});
+
 const app = express();
 const prisma = new PrismaClient();
 const port = process.env.PORT || 3001;
@@ -31,8 +40,8 @@ app.use('/api/categories', categoryRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  console.error('Error:', err);
+  res.status(500).json({ message: 'Something went wrong!', error: err.message });
 });
 
 // Health check endpoint

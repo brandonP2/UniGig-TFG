@@ -1,0 +1,130 @@
+// This is your Prisma schema file
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  name          String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  role          UserRole
+  student       Student?
+  client        Client?
+  messages      Message[]
+  activityLogs  ActivityLogs[]
+  conversations Conversation[] @relation("ConversationParticipants")
+}
+
+model Student {
+  id            String         @id @default(uuid())
+  userId        String         @unique
+  user          User          @relation(fields: [userId], references: [id])
+  university    String
+  major         String
+  graduationYear Int
+  services      Service[]
+  categories    Category[]
+}
+
+model Client {
+  id            String         @id @default(uuid())
+  userId        String         @unique
+  user          User          @relation(fields: [userId], references: [id])
+  company       String?
+  gigs          Gig[]
+}
+
+model Service {
+  id            String         @id @default(uuid())
+  title         String
+  description   String
+  price         Float
+  studentId     String
+  student       Student       @relation(fields: [studentId], references: [id])
+  category      Category      @relation(fields: [categoryId], references: [id])
+  categoryId    String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Category {
+  id            String         @id @default(uuid())
+  name          String        @unique
+  description   String?
+  services      Service[]
+  students      Student[]
+  gigs          Gig[]
+}
+
+model Gig {
+  id            String         @id @default(uuid())
+  title         String
+  description   String
+  budget        Float
+  status        GigStatus
+  clientId      String
+  client        Client        @relation(fields: [clientId], references: [id])
+  categoryId    String
+  category      Category      @relation(fields: [categoryId], references: [id])
+  activityLogs  ActivityLogs[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Review {
+  id            String         @id @default(uuid())
+  rating        Int
+  comment       String?
+  activityLogId String        @unique
+  activityLog   ActivityLogs  @relation(fields: [activityLogId], references: [id])
+  createdAt     DateTime      @default(now())
+}
+
+model Message {
+  id            String         @id @default(uuid())
+  content       String
+  senderId      String
+  sender        User          @relation(fields: [senderId], references: [id])
+  conversationId String
+  conversation  Conversation  @relation(fields: [conversationId], references: [id])
+  createdAt     DateTime      @default(now())
+}
+
+model Conversation {
+  id            String         @id @default(uuid())
+  participants  User[]        @relation("ConversationParticipants")
+  messages      Message[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model ActivityLogs {
+  id            String         @id @default(uuid())
+  action        String
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  gigId         String
+  gig           Gig           @relation(fields: [gigId], references: [id])
+  review        Review?
+  createdAt     DateTime      @default(now())
+}
+
+enum UserRole {
+  STUDENT
+  CLIENT
+}
+
+enum GigStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+} 

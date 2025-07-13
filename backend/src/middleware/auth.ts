@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { supabase } from '../config/supabase';
 
 interface AuthRequest extends Request {
   user?: {
@@ -8,7 +9,7 @@ interface AuthRequest extends Request {
   };
 }
 
-export const authenticateToken = (
+export const authenticateToken = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
@@ -21,6 +22,7 @@ export const authenticateToken = (
   }
 
   try {
+    // Verify JWT token
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET || 'your-secret-key'
@@ -28,6 +30,13 @@ export const authenticateToken = (
       userId: string;
       role: string;
     };
+
+    // Verify Supabase session
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error || !session) {
+      return res.status(403).json({ message: 'Invalid or expired session' });
+    }
 
     req.user = {
       id: decoded.userId,
