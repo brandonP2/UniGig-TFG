@@ -1,6 +1,8 @@
 {
   "version": 2,
   "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
   "env": {
     "NEXT_PUBLIC_API_URL": "https://unigig-tfg-production.up.railway.app"
   }
