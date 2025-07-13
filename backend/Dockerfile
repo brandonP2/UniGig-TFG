@@ -10,28 +10,25 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies including TypeScript
+# Install dependencies
 RUN npm install
 
 # Copy source code and configuration files
 COPY . .
 
-# Show current directory structure for debugging
-RUN echo "Current directory structure:" && ls -la
-
 # Generate Prisma Client
 RUN npx prisma generate
 
-# Show TypeScript version
-RUN echo "TypeScript version:" && npx tsc --version
+# Build TypeScript and verify the output
+RUN npm run build && \
+    ls -la dist/ && \
+    ls -la dist/src/ && \
+    ls -la dist/prisma/
 
-# Build TypeScript with verbose output
-RUN echo "Building TypeScript..." && \
-    npx tsc --listFiles && \
-    npx tsc
-
-# Show dist directory contents
-RUN echo "Dist directory contents:" && ls -la dist/
+# Move files to correct location
+RUN mv dist/src/* dist/ && \
+    mv dist/prisma/* dist/ && \
+    rm -rf dist/src dist/prisma
 
 # Clean up dev dependencies
 RUN npm prune --production
