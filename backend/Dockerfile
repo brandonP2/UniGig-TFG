@@ -19,8 +19,16 @@ COPY . .
 # Generate Prisma Client
 RUN npx prisma generate
 
-# Build TypeScript
-RUN npm run build
+# Build TypeScript and verify the output
+RUN npm run build && \
+    ls -la dist/ && \
+    ls -la dist/src/ && \
+    ls -la dist/prisma/
+
+# Move files to correct location
+RUN mv dist/src/* dist/ && \
+    mv dist/prisma/* dist/ && \
+    rm -rf dist/src dist/prisma
 
 # Clean up dev dependencies
 RUN npm prune --production
@@ -29,4 +37,4 @@ RUN npm prune --production
 EXPOSE 3001
 
 # Start the application
-CMD ["npm", "start"] 
+CMD ["node", "dist/index.js"] 
